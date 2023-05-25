@@ -3079,7 +3079,7 @@ int CSimControl::ExecLoop(char *loadBin, char *scriptFile)
 	if (scriptFile) {
 		script_fp = fopen(scriptFile, "r");
 		if (script_fp == NULL) {
-			printf("Failed to open the script file %s\n", scriptFile);
+			printf("ERROR: Failed to open script file '%s'\n", scriptFile);
 			return 1;
 		}
 	}
