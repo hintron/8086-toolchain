@@ -107,6 +107,11 @@ int CSimWindow::GetCommandString(char *dest, int maxBytes)
 	while(true) {
 		c = getchar();
 
+		if (c == EOF) {
+			printf("EOF reached 1\n");
+			break;
+		}
+
 		// Handle special characters
 		if(c == 27) {
 			if(extendedKeyPress() && getchar() == 91) {
@@ -126,7 +131,10 @@ int CSimWindow::GetCommandString(char *dest, int maxBytes)
 				for(; i > 0; i--) printf("\b \b");
 				continue;
 			}
-			while(extendedKeyPress()) getchar();	// Clear any buffered characters
+			while(extendedKeyPress()) {
+				printf("Flushing buffered characters");
+				getchar();	// Clear any buffered characters
+			}
 		}
 		else if(c == 14) {	// Ctrl+n
 			// Get more recent entry from history
