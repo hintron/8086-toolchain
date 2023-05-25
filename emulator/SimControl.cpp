@@ -3094,6 +3094,8 @@ int CSimControl::ExecLoop(char *loadBin, char *scriptFile)
 				continue;
 			}
 
+			printf("%s\n", cmdString);
+
 			// Skip command if it starts with a // comment
 			length = strlen(cmdString);
 			if ((length >= 2) && (cmdString[0] == '/' && cmdString[1] == '/')) {
@@ -3126,6 +3128,7 @@ int CSimControl::ExecLoop(char *loadBin, char *scriptFile)
 			SimIO.PrintText("Emu86>");
 			// Get next command form user interface
 			length = SimIO.GetCommandString(cmdString, COMMAND_BUFFER_SIZE);
+			exit(0);
 			if(length <= 0) continue;
 		}
 

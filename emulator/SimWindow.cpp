@@ -107,6 +107,11 @@ int CSimWindow::GetCommandString(char *dest, int maxBytes)
 	while(true) {
 		c = getchar();
 
+		if (c == EOF) {
+			break;
+		}
+
+		printf("%d", c);
 		// Handle special characters
 		if(c == 27) {
 			if(extendedKeyPress() && getchar() == 91) {
