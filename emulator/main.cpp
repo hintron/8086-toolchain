@@ -41,8 +41,9 @@ static const char *help =
 "Options:\n"
 "  <file> : The file to run on the emulator. Equivalent to the 'l <file>'\n"
 "           command once inside the emulator.\n"
-"  -s <script_file> : A file of newline-delimited emulator commands to run on\n"
-"                     startup.\n"
+"  -s <script_file> : A text file of newline-delimited emulator commands to\n"
+"                     run on startup. Supports # and // comments at the\n"
+"                     beginning of the line.\n"
 "  -h|--help : Print this help message.\n"
 ;
 
