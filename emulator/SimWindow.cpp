@@ -25,6 +25,8 @@
 #ifdef TERMIOS_CONSOLE
 
 #include "Conio.h"
+#include <fcntl.h>
+#include <unistd.h>
 
 
 CSimWindow::CSimWindow()
@@ -96,6 +98,7 @@ int CSimWindow::GetHistory(int dir, char *dest, int clearChars)
 }
 
 
+static int printed_once = false;
 // Get command string from user of length no more than maxBytes (including NULL).
 // Return number of characters in string (excluding NULL);
 // Also includes history functionality using up and down arrow keys (using CmdHistory class).
@@ -103,36 +106,74 @@ int CSimWindow::GetCommandString(char *dest, int maxBytes)
 {
 	int i = 0;
 	int c;
-	
-	while(true) {
-		c = getchar();
 
-		if (c == EOF) {
-			printf("EOF reached 1\n");
-			break;
+	while(true) {
+		// int flags;
+		// flags = fcntl(STDIN_FILENO, F_GETFL, 0);
+		// if (flags & O_NONBLOCK) {
+		// 	printf("stdin nonblocking 1\n");
+		// } else {
+		// 	printf("stdin blocking 1\n");
+		// }
+
+		c = getchar();
+		// printf("c = 0x%x\n", c);
+
+		// If failure caused by end-of-file condition
+		if (feof(stdin)) {
+			// Print once, or else this will keep printing over and over, since
+			// getchar() no longer blocks for user input and just returns -1.
+			// So there is nothing stopping the input loop from waiting for
+			// input.
+			if (!printed_once) printf("End of file reached\n");
+			printed_once = true;
+			// break;
 		}
+		// If failure caused by some other error
+		else if (ferror(stdin)) {
+			perror("getchar()");
+			fprintf(stderr, "getchar() failed\n");
+			exit(EXIT_FAILURE);
+		}
+
+		// flags = fcntl(STDIN_FILENO, F_GETFL, 0);
+		// if (flags & O_NONBLOCK) {
+		// 	printf("stdin nonblocking 2\n");
+		// } else {
+		// 	printf("stdin blocking 2\n");
+		// }
+		// if (c == EOF) {
+		// 	printf("EOF reached 1\n");
+		// 	// break;
+		// }
 
 		// Handle special characters
 		if(c == 27) {
 			if(extendedKeyPress() && getchar() == 91) {
+				printf("ARROW");
 				c = getchar();
 				if(c == 65) {	// Up arrow
+					printf(" UP\n");
 					// Get previous entry from history
 					i = GetHistory(GET_PREVIOUS, dest, i);
 				}
 				else if(c == 66) {	// Down arrow
+					printf(" DOWN\n");
 					// Get more recent entry from history
 					i = GetHistory(GET_NEXT, dest, i);
+				} else {
+					printf(" UNKNOWN\n");
 				}
 			}
 			else {		// Escape key
 				// Clear current command
+				printf("ESC\n");
 				history.Reset();
 				for(; i > 0; i--) printf("\b \b");
 				continue;
 			}
 			while(extendedKeyPress()) {
-				printf("Flushing buffered characters");
+				printf("Flushing buffered characters\n");
 				getchar();	// Clear any buffered characters
 			}
 		}
@@ -159,6 +200,7 @@ int CSimWindow::GetCommandString(char *dest, int maxBytes)
 
 		// Normal case:
 		else if(i < maxBytes-1) {
+			// printf("Putting 0x%x to stdout\n", c);
 			putchar(c);
 			dest[i] = (char)c;
 			i++;

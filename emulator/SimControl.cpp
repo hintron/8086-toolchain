@@ -3125,6 +3125,7 @@ int CSimControl::ExecLoop(char *loadBin, char *scriptFile)
 			// Display prompt
 			SimIO.PrintText("Emu86>");
 			// Get next command form user interface
+			// printf(" Get next command form user interface\n");
 			length = SimIO.GetCommandString(cmdString, COMMAND_BUFFER_SIZE);
 			if(length <= 0) continue;
 		}

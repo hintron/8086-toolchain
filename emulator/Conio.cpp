@@ -87,22 +87,45 @@ void disableKeyPress(void)
 char extendedKeyPress(void)
 {
 	struct termios new_settings;
+	struct termios saved_settings;
 	char c;
-	int old_VMIN;
+	// int old_VMIN;
+	cc_t old_VMIN;
 
 	// Disable blocking of getchar
-	tcgetattr(0,&new_settings);
-	old_VMIN = new_settings.c_cc[VMIN];
+	if (tcgetattr(0,&new_settings) == -1) printf("ERROR: tcgetattr() 1");
+	if (tcgetattr(0,&saved_settings) == -1) printf("ERROR: tcgetattr() 2");
+	// old_VMIN = new_settings.c_cc[VMIN];
+	// printf("old_VMIN: %d\n", old_VMIN);
+	// printf("old VTIME: %d\n", new_settings.c_cc[VTIME]);
+	// printf("old VEOL: %d\n", new_settings.c_cc[VEOL]);
+	// printf("old VEOF: %d\n", new_settings.c_cc[VEOF]);
+	// printf("old c_lflag: %x\n", new_settings.c_lflag);
+	// printf("old c_iflag: %x\n", new_settings.c_iflag);
+	// printf("old c_oflag: %x\n", new_settings.c_oflag);
+	// printf("old c_cflag: %x\n", new_settings.c_cflag);
+
 	new_settings.c_cc[VMIN] = 0;
-	tcsetattr(0, TCSANOW, &new_settings);
+	if (tcsetattr(0, TCSANOW, &new_settings) == -1) printf("ERROR: tcsetattr() VMIN 0");
 
 	c = getchar();
 	
-	// Restore blocking of getchar
-	new_settings.c_cc[VMIN] = old_VMIN;
-	tcsetattr(0, TCSANOW, &new_settings);
+	// // Restore blocking of getchar
+	// new_settings.c_cc[VMIN] = old_VMIN;
+	// Alternatively, just restore saved settings
+	if (tcsetattr(0, TCSANOW, &saved_settings) == -1) printf("ERROR: tcsetattr() restore saved_settings");
+
+	// if (tcgetattr(0,&saved_settings) == -1) printf("ERROR: tcgetattr() restored settings");
+	// printf("restored VMIN: %d\n", saved_settings.c_cc[VMIN]);
+	// printf("restored VEOL: %d\n", saved_settings.c_cc[VEOL]);
+	// printf("restored VEOF: %d\n", saved_settings.c_cc[VEOF]);
+	// printf("restored c_lflag: %x\n", saved_settings.c_lflag);
+	// printf("restored c_iflag: %x\n", saved_settings.c_iflag);
+	// printf("restored c_oflag: %x\n", saved_settings.c_oflag);
+	// printf("restored c_cflag: %x\n", saved_settings.c_cflag);
 
 	if(c != EOF) {
+		printf("ungetc %d\n", c);
 		ungetc(c, stdin);
 		return c;
 	}
