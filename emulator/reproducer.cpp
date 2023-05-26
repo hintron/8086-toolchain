@@ -10,12 +10,11 @@
 // getchar() being non-blocking and always returning EOF (-1).
 // 
 // The problem/bug is that when VMIN is set back to 1, this non-blocking
-// behavior remains. It almost seems like it's a glibc problem where glibc is
+// behavior remains. It appears to be a glibc problem where glibc is
 // smart enough to change stdin reads from blocking to non-blocking when VMIN is
 // set to 0, but when it is set back to 1, it doesn't know how to set it back to
-// blocking.
-
-// TODO: Do a test to see if it's glibc's fault, or if it's Linux's fault.
+// blocking. The Linux API's read() command respects when VMIN is set back to 1,
+// but glibc doesn't.
 
 // Build command:
 //     gcc -m32 emulator/reproducer.cpp 
@@ -36,6 +35,26 @@ static void _restore() {
 	// Set terminal to raw mode
 	tcsetattr(STDIN_FILENO, TCSANOW, &stored_settings);
 	printf("Restored terminal\n");
+}
+
+// #define USE_LIBC false
+#define USE_LIBC true
+
+// Use getchar() from libc or do an equivalent read using the Linux API.
+// Let's see if we get similar behavior. If so, then we can't blame libc.
+static int _getchar_wrapper() {
+	if (USE_LIBC) {
+		// Use getchar() from libc
+		return getchar();
+	} else {
+		// Use a getchar() equivalent using the Linux API directly (thanks,
+		// ChatGPT!)
+		char c;
+		if (read(0, &c, 1) == 1)
+			return (int)c;
+		else
+			return EOF;
+	}
 }
 
 int main() {
@@ -63,12 +82,14 @@ int main() {
 	*(int *)a;
 
 	while(true) {
-		int c = getchar();
+		int c = _getchar_wrapper();
 		count++;
 
+		printf("char = %x\n", c);
 		if (c == EOF) {
 			// printf("%d: getchar returned EOF (-1)\n", count);
-			if (count > 100000000) {
+			// if (count > 100000000) {
+			if (count > 50) {
 				printf("Turning getchar back to blocking\n");
 
 				new_settings.c_cc[VMIN] = 1;
@@ -88,7 +109,6 @@ int main() {
 			}
 			continue;
 		}
-		printf("char = %x\n", c);
 		
 		if (c == 'q') {
 			break;
