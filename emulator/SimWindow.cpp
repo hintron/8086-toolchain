@@ -149,33 +149,34 @@ int CSimWindow::GetCommandString(char *dest, int maxBytes)
 
 		// Handle special characters
 		if(c == 27) {
-			if(extendedKeyPress() && getchar() == 91) {
-				printf("ARROW");
+			// if(extendedKeyPress() && getchar() == 91) {
+			if(getchar() == 91) {
+				// printf("ARROW");
 				c = getchar();
 				if(c == 65) {	// Up arrow
-					printf(" UP\n");
+					// printf(" UP\n");
 					// Get previous entry from history
 					i = GetHistory(GET_PREVIOUS, dest, i);
 				}
 				else if(c == 66) {	// Down arrow
-					printf(" DOWN\n");
+					// printf(" DOWN\n");
 					// Get more recent entry from history
 					i = GetHistory(GET_NEXT, dest, i);
 				} else {
-					printf(" UNKNOWN\n");
+					// printf(" UNKNOWN\n");
 				}
 			}
 			else {		// Escape key
 				// Clear current command
-				printf("ESC\n");
+				// printf("ESC\n");
 				history.Reset();
 				for(; i > 0; i--) printf("\b \b");
 				continue;
 			}
-			while(extendedKeyPress()) {
-				printf("Flushing buffered characters\n");
-				getchar();	// Clear any buffered characters
-			}
+			// while(extendedKeyPress()) {
+			// 	printf("Flushing buffered characters\n");
+			// 	getchar();	// Clear any buffered characters
+			// }
 		}
 		else if(c == 14) {	// Ctrl+n
 			// Get more recent entry from history
