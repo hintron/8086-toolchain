@@ -78,6 +78,9 @@ void disableKeyPress(void)
 }
 
 
+// WARNING: This has a bug with glibc where once stdin becomes non-blocking,
+// it can never become blocking again... Reads from the Linux API do not have
+// this problem.
 // Returns the value of the key or extended key waiting to be read.
 // If no key is waiting, returns 0.
 // Use this function after the value 27 (ESC) is read to check if
