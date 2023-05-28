@@ -110,28 +110,38 @@ int CSimWindow::GetCommandString(char *dest, int maxBytes)
 	
 	while(true) {
 		c = getchar_nix();
+		printf("GetCommandString: getchar %d\n", c);
 
 		// Handle special characters
 		if(c == 27) {
 			char next = extendedKeyPress();
 			if(next && next == 91) {
 				c = getchar_nix();
+				printf("ARROW");
 				if(c == 65) {	// Up arrow
+					printf(" UP\n");
 					// Get previous entry from history
 					i = GetHistory(GET_PREVIOUS, dest, i);
 				}
 				else if(c == 66) {	// Down arrow
+					printf(" DOWN\n");
 					// Get more recent entry from history
 					i = GetHistory(GET_NEXT, dest, i);
+				} else {
+					printf(" UNKNOWN\n");
 				}
 			}
 			else {		// Escape key
+				printf("ESC\n");
 				// Clear current command
 				history.Reset();
 				for(; i > 0; i--) printf("\b \b");
 				continue;
 			}
-			while(extendedKeyPress()) {}	// Clear any buffered characters
+			printf("Need to clear buffer\n");
+			while(extendedKeyPress()) {
+				printf("clearing buffer\n");
+			};	// Clear any buffered characters
 		}
 		else if(c == 14) {	// Ctrl+n
 			// Get more recent entry from history
@@ -156,7 +166,9 @@ int CSimWindow::GetCommandString(char *dest, int maxBytes)
 
 		// Normal case:
 		else if(i < maxBytes-1) {
+			printf("Put %c\n", (char)c);
 			putchar(c);
+			// flush(stdout);
 			dest[i] = (char)c;
 			i++;
 		}

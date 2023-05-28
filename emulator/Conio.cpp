@@ -30,12 +30,13 @@ static int conioEnabled = FALSE;
 
 
 // Use getchar() from libc or do an equivalent read using the Linux API.
+// Let's see if we get similar behavior. If so, then we can't blame libc.
 int getchar_nix() {
 #ifdef USE_LIBC
 	// Use getchar() from glibc
 	return getchar();
 #else
-	// Use getchar() equivalent via the Linux API
+	// Use getchar() equivalent via the Linux API (thanks, ChatGPT!)
 	char c;
 	if (read(0, &c, 1) == 1) {
 		return (int)c;
@@ -119,12 +120,14 @@ char extendedKeyPress(void)
 	tcsetattr(0, TCSANOW, &new_settings);
 
 	c = getchar_nix();
-	
+	printf("extendedKeyPress getchar %d\n", c);
+
 	// Restore blocking of getchar
 	new_settings.c_cc[VMIN] = old_VMIN;
 	tcsetattr(0, TCSANOW, &new_settings);
 
 	if(c != EOF) {
+		// ungetc(c, stdin);
 		return c;
 	}
 	return 0;
