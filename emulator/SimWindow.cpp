@@ -49,6 +49,10 @@ bool CSimWindow::InitWindow(void)
 void CSimWindow::PrintText(const char *string)
 {
 	printf("%s", string);
+	// libc's getchar() will normally force stdout to first be flushed. But if
+	// we are replacing getchar() with a Linux read() call, then we need to
+	// manually flush stdout. So do it every time, just to cover both cases.
+	fflush(stdout);
 }
 
 
@@ -105,12 +109,13 @@ int CSimWindow::GetCommandString(char *dest, int maxBytes)
 	int c;
 	
 	while(true) {
-		c = getchar();
+		c = getchar_nix();
 
 		// Handle special characters
 		if(c == 27) {
-			if(extendedKeyPress() && getchar() == 91) {
-				c = getchar();
+			char next = extendedKeyPress();
+			if(next && next == 91) {
+				c = getchar_nix();
 				if(c == 65) {	// Up arrow
 					// Get previous entry from history
 					i = GetHistory(GET_PREVIOUS, dest, i);
@@ -126,7 +131,7 @@ int CSimWindow::GetCommandString(char *dest, int maxBytes)
 				for(; i > 0; i--) printf("\b \b");
 				continue;
 			}
-			while(extendedKeyPress()) getchar();	// Clear any buffered characters
+			while(extendedKeyPress()) {}	// Clear any buffered characters
 		}
 		else if(c == 14) {	// Ctrl+n
 			// Get more recent entry from history

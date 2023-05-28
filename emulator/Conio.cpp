@@ -4,6 +4,7 @@
 #include <termios.h>
 #include <string.h>
 
+#include <unistd.h>
 #include <sys/select.h>
 
 #include "Conio.h"
@@ -17,11 +18,32 @@
 
 #define STDIN_FD 0
 
+// // Uncomment to use buggy libc getchar() that won't return stdin to blocking
+// // once the terminal is set to non-blocking.
+// #define USE_LIBC
+
 static struct termios stored_settings;
 static fd_set stdin_wait_set;
 static struct timeval tm_zero;
 
 static int conioEnabled = FALSE;
+
+
+// Use getchar() from libc or do an equivalent read using the Linux API.
+int getchar_nix() {
+#ifdef USE_LIBC
+	// Use getchar() from glibc
+	return getchar();
+#else
+	// Use getchar() equivalent via the Linux API
+	char c;
+	if (read(0, &c, 1) == 1) {
+		return (int)c;
+	} else {
+		return EOF;
+	}
+#endif
+}
 
 
 // Disable automatic keyboard echo (not normal mode).
@@ -96,14 +118,13 @@ char extendedKeyPress(void)
 	new_settings.c_cc[VMIN] = 0;
 	tcsetattr(0, TCSANOW, &new_settings);
 
-	c = getchar();
+	c = getchar_nix();
 	
 	// Restore blocking of getchar
 	new_settings.c_cc[VMIN] = old_VMIN;
 	tcsetattr(0, TCSANOW, &new_settings);
 
 	if(c != EOF) {
-		ungetc(c, stdin);
 		return c;
 	}
 	return 0;
