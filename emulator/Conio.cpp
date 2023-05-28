@@ -35,8 +35,12 @@ int getchar_nix() {
 	// Use getchar() from glibc
 	return getchar();
 #else
-	// Use getchar() equivalent via the Linux API
 	char c;
+	// libc's getchar() will normally force stdout to first be flushed. But if
+	// we are replacing getchar() with a Linux read() call, then we need to
+	// manually flush stdout. So do it every time.
+	fflush(stdout);
+	// Use getchar() equivalent via the Linux API
 	if (read(0, &c, 1) == 1) {
 		return (int)c;
 	} else {
