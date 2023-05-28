@@ -8,7 +8,7 @@
 // extendedKeyPress() will set VMIN to 0. VMIN==0 and VTIME==0 mean that all
 // OS reads will be non-blocking, returning 0. This translates into libc's
 // getchar() being non-blocking and always returning EOF (-1).
-// 
+//
 // The problem/bug is that when VMIN is set back to 1, this non-blocking
 // behavior remains. It appears to be a glibc problem where glibc is
 // smart enough to change stdin reads from blocking to non-blocking when VMIN is
@@ -17,10 +17,15 @@
 // but glibc doesn't.
 
 // Build command:
-//     gcc -m32 emulator/reproducer.cpp 
+//     make reproducer
 
 // To reproduce:
-//    ./a.out
+//    # Linux read() version (WORKS AS INTENDED)
+//    ./emulator/reproducer.out
+//    Type 20 characters to trigger setting from blocking to non-blocking.
+//
+//    # libc getchar() version (BROKEN)
+//    ./emulator/reproducer.out use_libc
 //    Type 20 characters to trigger setting from blocking to non-blocking.
 
 #include <stdlib.h>
@@ -37,13 +42,10 @@ static void _restore() {
 	printf("Restored terminal\n");
 }
 
-// #define USE_LIBC false
-#define USE_LIBC true
-
 // Use getchar() from libc or do an equivalent read using the Linux API.
 // Let's see if we get similar behavior. If so, then we can't blame libc.
-static int _getchar_wrapper() {
-	if (USE_LIBC) {
+static int _getchar_wrapper(bool use_libc) {
+	if (use_libc) {
 		// Use getchar() from libc
 		return getchar();
 	} else {
@@ -57,11 +59,20 @@ static int _getchar_wrapper() {
 	}
 }
 
-int main() {
+int main(int argc, char **argv) {
 	int count = 0;
 	bool non_blocking = false;
 	struct termios new_settings;
 	fd_set stdin_wait_set;
+
+	bool use_libc;
+	if (argc > 1) {
+		use_libc = true;
+		printf("Using libc's getchar()\n");
+	} else {
+		use_libc = false;
+		printf("Using Linux's read() instead of libc's getchar()\n");
+	}
 
 	// Restore the terminal to the original state, even on ctrl-C
 	atexit(_restore);
@@ -78,11 +89,8 @@ int main() {
 	new_settings.c_cc[VMIN] = 1;
 	tcsetattr(STDIN_FILENO, TCSANOW, &new_settings);
 
-	int a = 0;
-	*(int *)a;
-
 	while(true) {
-		int c = _getchar_wrapper();
+		int c = _getchar_wrapper(use_libc);
 		count++;
 
 		printf("char = %x\n", c);
@@ -94,27 +102,24 @@ int main() {
 
 				new_settings.c_cc[VMIN] = 1;
 				tcsetattr(STDIN_FILENO, TCSANOW, &new_settings);
-				// Alternatively, restore to original terminal settings.
+				// Restoring original terminal settings is also sufficient.
+
 				// getchar() is still non-blocking, even in canonical mode!
-				// _restore();
 
 				non_blocking = false;
 				count = 0;
-				
-				// Closing stdin doesn't seem to "reset" it
-				// close(STDIN_FILENO);
 
 				// BUG/ERROR: Even after resetting VMIN back to 1, getchar is
-				// still non-blocking!
+				// still non-blocking when use_libc == true!
 			}
 			continue;
 		}
-		
+
 		if (c == 'q') {
 			break;
 		}
 
-		if (non_blocking == false && count >= 20) {
+		if (non_blocking == false && count > 20) {
 			non_blocking = true;
 			printf("Turning getchar to non-blocking\n");
 			new_settings.c_cc[VMIN] = 0;
