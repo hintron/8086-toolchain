@@ -32,14 +32,14 @@ void closeConio(void);
 #endif
 
 static const char *usage =
-"Usage: emu86 [<file>] [-c <commands>] [-s <script_file>] [-h|--help]\n";
+"Usage: emu86 [OPTIONS]\n";
 
 static const char *help = 
 "\n"
 "Welcome to the BYU ECEn 425 8086 emulator.\n"
 "For a list of commands, run the h or ? command in the emulator.\n"
 "\n"
-"Options:\n"
+"OPTIONS:\n"
 "  <file> : The file to run on the emulator. Equivalent to the 'l <file>'\n"
 "           command once inside the emulator.\n"
 "  -c <commands> : A ;-delimited string of commands to run on startup.\n"
