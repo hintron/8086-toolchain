@@ -1,7 +1,12 @@
 8086 Toolchain
 ==============
 
-This is the 8086 build toolchain for BYU ECEn 425, and was taken from the CAEDM servers (`/ee2/ee425/src/dist`).
+This is the 8086 toolchain for BYU ECEn 425 (Real Time Operating
+Systems). This also includes [an archive of the class website](#website),
+including all the homework, labs, documentation, and lectures from the class.
+
+The toolchain was taken directly from `/ee2/ee425/src/dist` on the BYU CAEDM
+computers.
 
 **Disclaimer:** For ECEn 425 projects, this may or may not compile exactly the same as the CAEDM machines
 
@@ -104,14 +109,15 @@ test:
 
 ## Website ##
 
-The ECEn 425 website is stored in directory `ece425web.groups.et.byu.net/` and
-contains lab instructions, 8086 resources, homework assignments, and class
-slides.
+The ECEn 425 website is stored in directory
+[`ece425web.groups.et.byu.net/`](ece425web.groups.et.byu.net) and contains lab
+instructions, 8086 resources, homework assignments, and class slides.
 
 ### Browsing the website ##
 
-You can open file `ece425web.groups.et.byu.net/index.html` locally with a web
-browser, and all the links should work.
+You can open file
+[`ece425web.groups.et.byu.net/index.html`](ece425web.groups.et.byu.net/index.html)
+locally with a web browser, and all the links should work.
 
 Another option is to host the website locally. In a terminal, do:
 
