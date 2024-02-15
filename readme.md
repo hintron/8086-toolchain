@@ -1,6 +1,6 @@
 # 8086 Toolchain
 
-This is the 8086 toolchain for BYU ECEn 425 (Real Time Operating
+This is the C-based 8086 toolchain for BYU ECEn 425 (Real Time Operating
 Systems). This repo also includes [an archive of the class website][4],
 including all the homework, labs, documentation, and lectures from the class.
 
@@ -131,16 +131,18 @@ Then, access the local website in your browser at `localhost:8000`.
 This option is nice because it allows Chrome extensions (like DarkReader) to
 work (Chrome extensions are not allowed to run on local file paths).
 
-### Updating GitHub pages
+### Updating the website hosted by GitHub pages
 
-To update GitHub pages, first install the [`ghp-import`][5] Python module:
+To update the class website hosted by GitHub pages, first install the
+[`ghp-import`][5] Python module:
 
 ```bash
 pip install ghp-import
 ```
 
 Then, simply run `scripts/gh-pages-import.sh`. This will overwrite the
-`gh-pages` branch of this repo with the contents of the `website/` directory.
+`gh-pages` branch of this repo with the current contents of the `website/`
+directory.
 
 ### Website history
 
