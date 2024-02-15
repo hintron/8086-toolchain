@@ -2,7 +2,7 @@
 ==============
 
 This is the 8086 toolchain for BYU ECEn 425 (Real Time Operating
-Systems). This also includes [an archive of the class website](#website),
+Systems). This repo also includes [an archive of the class website][4],
 including all the homework, labs, documentation, and lectures from the class.
 
 The toolchain was taken directly from `/ee2/ee425/src/dist` on the BYU CAEDM
@@ -115,8 +115,11 @@ slides.
 
 ### Browsing the website ##
 
-You can open file `website/index.html` locally with a web
-browser, and all the links should work.
+The class website is [currently hosted via GitHub pages here][4]. The original site is also
+[available on WayBack Machine][2].
+
+Optionally, you can browse all the files locally by pointing your web broswer to
+the file `website/index.html`, and all the links should work.
 
 Another option is to host the website locally. In a terminal, do:
 
@@ -124,9 +127,21 @@ Another option is to host the website locally. In a terminal, do:
 cd website/
 python3 -m http.server 8000
 ```
+
 Then, access the local website in your browser at `localhost:8000`.
 This option is nice because it allows Chrome extensions (like DarkReader) to
 work (Chrome extensions are not allowed to run on local file paths).
+
+### Updating GitHub pages
+
+To update GitHub pages, first install the [`ghp-import`][5] Python module:
+
+```bash
+pip install ghp-import
+```
+
+Then, simply run `scripts/gh-pages-import.sh`. This will overwrite the
+`gh-pages` branch of this repo with the contents of the `website/` directory.
 
 ### Website history
 
@@ -140,3 +155,5 @@ saved to this repo on 2023-05-03 using [this tool][3].
 [1]: http://ece425web.groups.et.byu.net/
 [2]: https://web.archive.org/web/20220126003933/http://ece425web.groups.et.byu.net/
 [3]: https://github.com/hartator/wayback-machine-downloader
+[4]: https://hintron.github.io/8086-toolchain/
+[5]: https://pypi.org/project/ghp-import/
